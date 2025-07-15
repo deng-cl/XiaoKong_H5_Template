@@ -1,0 +1,20 @@
+/* src/styles/vant-theme.scss vant 全局变量 */
+
+/* :root:root 提高vant全局变量权重 */
+:root:root {
+    /* 品牌主色 */
+    --tevau-primary-color: #298dff;
+    /* 主要颜色 */
+    --van-primary-color: var(--tevau-primary-color);
+    /* 文本色 / 背景色 */
+    --van-text-color: #1f2024;
+    --van-background-color: #ffffff;
+    /* 其他变量 */
+    --van-tabbar-height: 60px;
+    // Popover 气泡弹出框背景色
+    --van-popover-light-background: rgba(255, 255, 255, 0.5);
+    /* 表单输入框边框颜色 */
+    --form-border-color: #cfcfcf;
+    /* 导航栏高度 */
+    --van-nav-bar-height: 56px;
+}

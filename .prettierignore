@@ -1,0 +1,5 @@
+tests/
+build/
+docs/
+*.md
+.vscode

@@ -1,0 +1,6 @@
+:root,
+:host {
+    /* presetWind4 theme options */
+    /* 大小属性系列: 如 `w-1` → width: 4px */
+    --spacing: 4px;
+}

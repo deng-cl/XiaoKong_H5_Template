@@ -1,0 +1,25 @@
+{
+  "recommendations": [
+    "Vue.volar",
+    "esbenp.prettier-vscode",
+    "lokalise.i18n-ally",
+    "fredu.color-conversion",
+    "kamikillerto.vscode-colorize",
+    "mikestead.dotenv",
+    "EditorConfig.EditorConfig",
+    "eamodio.gitlens",
+    "antfu.iconify",
+    "Meezilla.json",
+    "shd101wyy.markdown-preview-enhanced",
+    "christian-kohler.path-intellisense",
+    "csstools.postcss",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "enkia.tokyo-night",
+    "antfu.unocss",
+    "Vue.volar",
+    "sdras.vue-vscode-snippets",
+    "redhat.vscode-yaml",
+    "vscode-icons-team.vscode-icons"
+  ]
+}

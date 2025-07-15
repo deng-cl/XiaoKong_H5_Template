@@ -1,0 +1,65 @@
+{
+    "name": "h-plain-backstage-main",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build:dev": "run-p type-check & vite build --mode development",
+        "build:test": "run-p type-check & vite build --mode test",
+        "build:pre": "run-p type-check & vite build --mode pre",
+        "build:prd": "run-p type-check & vite build --mode production",
+        "preview": "vite preview",
+        "type-check": "vue-tsc --build",
+        "format": "prettier --write src/"
+    },
+    "dependencies": {
+        "@vueuse/components": "^13.3.0",
+        "@vueuse/core": "^13.3.0",
+        "axios": "^1.9.0",
+        "boxen": "^8.0.1",
+        "crypto-js": "^4.2.0",
+        "dayjs": "^1.11.13",
+        "gradient-string": "^3.0.0",
+        "jsencrypt": "^3.3.2",
+        "normalize.css": "^8.0.1",
+        "pinia": "^3.0.1",
+        "pinia-plugin-persistedstate": "^4.3.0",
+        "qs": "^6.14.0",
+        "sass": "^1.89.0",
+        "vant": "^4.9.21",
+        "vue": "^3.5.13",
+        "vue-i18n": "11",
+        "vue-router": "^4.5.0"
+    },
+    "devDependencies": {
+        "@tsconfig/node22": "^22.0.1",
+        "@types/node": "^22.14.0",
+        "@vant/auto-import-resolver": "^1.3.0",
+        "@vitejs/plugin-vue": "^5.2.3",
+        "@vitejs/plugin-vue-jsx": "^4.2.0",
+        "@vue/babel-plugin-jsx": "^1.4.0",
+        "@vue/tsconfig": "^0.7.0",
+        "code-inspector-plugin": "^0.20.10",
+        "npm-run-all2": "^7.0.2",
+        "postcss-px-to-viewport": "^1.1.1",
+        "prettier": "3.5.3",
+        "typescript": "~5.8.0",
+        "unplugin-auto-import": "^19.3.0",
+        "unplugin-vue-components": "^28.7.0",
+        "vite": "^6.2.4",
+        "vite-plugin-compression2": "^1.4.0",
+        "vite-plugin-fake-server": "^2.2.0",
+        "vite-plugin-remove-console": "^2.2.0",
+        "vite-plugin-vue-devtools": "^7.7.2",
+        "vue-tsc": "^2.2.8"
+    },
+    "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "@parcel/watcher",
+            "esbuild",
+            "vue-demi"
+        ]
+    }
+}
