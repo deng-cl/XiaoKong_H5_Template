@@ -1,75 +1,5 @@
 import axios from 'axios'
-import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosRequestConfig } from 'axios'
-
-class HRequest {
-    instance: AxiosInstance
-    interceptors: Partial<HRequestInterceptors> | undefined /* Partial: 统一转换可选类型 */
-
-    constructor(config: /* HRequestConfig: 对原来的 axios 中的 AxiosRequestConfig 接口进行扩展*/ HRequestConfig) {
-        this.instance =
-            axios.create(
-                config,
-            ) /* 每次 new HRquest 时，都是一个独立的 axios 实例供下面所要封装的请求方法使用 <业务需要可能要创建多个 instance 实例: 如当项目中需要使用多个请求 baseURL 时> */
-
-        /* 实例拦截器 <对当前实例所有方法都会生效>: 调用自定义拦截器 Hooks : 创建 HRequest 实例或使用下面实例封装的方法时可自定义配置拦截器 hooks 来做对应的拦截操作 */
-        this.interceptors = config.interceptors /* 获取 config 中拦截器参数 hooks */
-        this.instance.interceptors.request.use(
-            this.interceptors?.requestInterceptor || ((config) => config),
-            this.interceptors?.requestInterceptorCatch || ((error) => Promise.reject(error)),
-        )
-
-        this.instance.interceptors.response.use(
-            this.interceptors?.responseInterceptor || ((response) => response),
-            this.interceptors?.responseInterceptorCatch || ((error) => Promise.reject(error)),
-        )
-    }
-
-    request<R>(config: HRequestConfig<R>): Promise<R> {
-        if (config?.interceptors?.requestInterceptor) {
-            /* 局部请求拦截器 */
-            config = config.interceptors.requestInterceptor(
-                config as InternalAxiosRequestConfig /* 通过类型断言进行类型范围延申，使其符合对应的拦截器类型 */,
-            )
-        }
-
-        return this.instance
-            .request<any, R>(config)
-            .then((res) => {
-                /* 通过实例中的 instance/axios 实例，来进行对应请求的封装 */
-                if (config?.interceptors?.responseInterceptor) {
-                    /* 局部响应拦截器 */
-                    res = config.interceptors.responseInterceptor(res) /* 将最终的 res 断言成 R 类型 */
-                }
-                return res
-            })
-            .catch((err) => {
-                if (config?.interceptors?.responseInterceptorCatch) {
-                    err = config.interceptors.responseInterceptorCatch(err)
-                }
-                return err
-            })
-    }
-
-    get<R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}): Promise<R> {
-        return this.request<R>({ ...config, url, method: 'GET' })
-    }
-
-    post<R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}): Promise<R> {
-        return this.request<R>({ ...config, url, method: 'POST' })
-    }
-
-    delete<R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}): Promise<R> {
-        return this.request<R>({ ...config, url, method: 'DELETE' })
-    }
-
-    patch<R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}): Promise<R> {
-        return this.request<R>({ ...config, url, method: 'PATCH' })
-    }
-
-    put<R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}): Promise<R> {
-        return this.request<R>({ ...config, url, method: 'PUT' })
-    }
-}
+import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosRequestConfig, Method } from 'axios'
 
 /** HRequest 实例 config 配置对象类型声明 */
 export interface HRequestConfig<T = HInternalAxiosResponseConfig> extends AxiosRequestConfig {
@@ -78,7 +8,6 @@ export interface HRequestConfig<T = HInternalAxiosResponseConfig> extends AxiosR
 
 /** 拦截器扩展类型声明 */
 export interface HRequestInterceptors<T = HInternalAxiosResponseConfig> {
-    /* 定义 HRequestInterceptors 接口: 用于扩展 axios 中的 config 的 AxiosRequestConfig，扩展 axios 拦截器参数 */
     requestInterceptor: (config: HInternalAxiosRequestConfig) => HInternalAxiosRequestConfig
     requestInterceptorCatch: (error: any) => any
     responseInterceptor: (config: T) => T
@@ -92,6 +21,57 @@ export interface HInternalAxiosRequestConfig extends InternalAxiosRequestConfig 
 /** 响应拦截器类型扩展 */
 export interface HInternalAxiosResponseConfig extends AxiosResponse {
     [key: string]: any
+}
+
+// --------------------------------------------- HRequest 实现
+class HRequest {
+    instance: AxiosInstance
+    interceptors: Partial<HRequestInterceptors> | undefined
+
+    constructor(config: HRequestConfig) {
+        // -- 创建 axios 实例
+        this.instance = axios.create(config)
+
+        // -- 全局拦截器解构
+        const { requestInterceptor, requestInterceptorCatch, responseInterceptor, responseInterceptorCatch } = (this.interceptors = config.interceptors) ?? {}
+
+        // -- 全局请求拦截器
+        this.instance.interceptors.request.use(requestInterceptor || ((config) => config), requestInterceptorCatch || ((error) => Promise.reject(error)))
+
+        // -- 全局响应拦截器
+        this.instance.interceptors.response.use(responseInterceptor || ((response) => response), responseInterceptorCatch || ((error) => Promise.reject(error)))
+    }
+
+    // -- 公共调用方法
+    async request<R>(config: HRequestConfig<R>): Promise<R> {
+        // -- 局部拦截器解构
+        const { requestInterceptor, responseInterceptor, responseInterceptorCatch } = config.interceptors ?? {}
+
+        // -- 局部请求拦截器
+        if (requestInterceptor) config = requestInterceptor(config as InternalAxiosRequestConfig)
+
+        // -- 发起请求
+        try {
+            const result = await this.instance.request<any, R>(config)
+            return responseInterceptor ? responseInterceptor(result) : result // -- 局部响应拦截器
+        } catch (error: any) {
+            return responseInterceptorCatch ? responseInterceptorCatch(error) : error // -- 局部响应拦截器
+        }
+    }
+
+    // -- 动态生成 HTTP 方法(闭包)
+    private createHttpMethod(method: Method) {
+        return <R>(url: string, config: Omit<HRequestConfig<R>, 'url'> = {}) => {
+            return this.request<R>({ ...config, url, method })
+        }
+    }
+
+    // -- 快捷请求方法
+    public get = this.createHttpMethod('GET')
+    public post = this.createHttpMethod('POST')
+    public delete = this.createHttpMethod('DELETE')
+    public patch = this.createHttpMethod('PATCH')
+    public put = this.createHttpMethod('PUT')
 }
 
 export * from './utils'

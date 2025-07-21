@@ -1,4 +1,4 @@
-import { curry } from '../comcom/funs'
+import { curry } from '../comcom'
 import HRequest, { fetchFunctionBatchGenerator } from './baseImple'
 import { requestInterceptorHandle, responseInterceptorHandle } from './interceptors'
 
@@ -29,6 +29,12 @@ const http = new HRequest({
  *     - method: 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT',
  *     - url: string
  *  - ]
+ *
+ * Example:
+ *  - const { getUsername, getUserAge } = fetchFunctionBatchGeneratorCurry<{ getUsername: string; getUserAge: number }>([
+ *     - { key: 'getUsername', url: '/user/name', method: 'GET' },
+ *     - ['getUserAge', '/user/age', 'GET']
+ *  - ])
  */
 export const fetchFunctionBatchGeneratorCurry = curry(fetchFunctionBatchGenerator)(http) // -- 通过函数柯里化，使其 fetchFunctionBatchGenerator 固定该 http 实例，使用起来只需传入第二个参数即可
 export default http
