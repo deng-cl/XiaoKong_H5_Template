@@ -1,7 +1,8 @@
-import http, { fetchFunctionBatchGeneratorCurry } from '@/utils/http'
+import http from '@/utils/http'
+import { fetchFunctionBatchGenerator } from '@/utils/http/baseImple'
 
 /** 例子
-    export const { queryTestTableList, queryTestTableListTest2 } = fetchFunctionBatchGeneratorCurry([
+    export const { queryTestTableList, queryTestTableListTest2 } = fetchFunctionBatchGenerator<T>(http,[
         {
             key: 'queryTestTableList',
             method: 'POST',
